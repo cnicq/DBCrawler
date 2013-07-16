@@ -9,5 +9,7 @@ class Website(Item):
 
 class IndicatorItem(Item):
 	loc_name = Field()
+
+class WorldBankIndicatorItem(IndicatorItem):
 	xls_url = Field()
 	code = Field()
