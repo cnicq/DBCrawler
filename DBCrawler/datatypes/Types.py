@@ -8,6 +8,7 @@ class IndicatorType:
 	Period = ""
 	OwnerOrg = ""
 	Note = ""
+	ParentType = ""
 
 	def ToMap():
 		DataMap = {}
@@ -19,6 +20,7 @@ class IndicatorType:
 		DataMap['Period'] = Period;
 		DataMap['OwnerOrg'] = OwnerOrg;
 		DataMap['Note'] = Note;
+		DataMap['ParentType'] = ParentType;
 
 		return DataMap
 
@@ -30,10 +32,10 @@ class MetaData:
 	DateTime = ""
 	RefURL = ""
 	Value = ""
+	ForcastValue = ""
 	ReleaseTime = ""
 	GatherTime = ""
 	Notes = ""
-	Forcast = ""
 	def ToMap():
 		DataMap = {}
 		DataMap['IndicatorTypeCode'] = IndicatorTypeCode;
@@ -43,10 +45,10 @@ class MetaData:
 		DataMap['DateTime'] = DateTime;
 		DataMap['RefURL'] = RefURL;
 		DataMap['Value'] = Value;
+		DataMap['ForcastValue'] = ForcastValue;
 		DataMap['ReleaseTime'] = ReleaseTime;
 		DataMap['GatherTime'] = GatherTime;
 		DataMap['Notes'] = Notes;
-		DataMap['Forcast'] = Forcast;
 		return DataMap
 
 class Area:

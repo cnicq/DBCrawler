@@ -1,0 +1,3 @@
+ERROR(FileException): http://money.finance.sina.com.cn/mac/view/vMacExcle.php?cate=price&event=2&from=0&num=9999999&condition=: noaccess-filename
+ERROR(FileException): http://money.finance.sina.com.cn/mac/view/vMacExcle.php?cate=nation&event=14&from=0&num=9999999&condition=: noaccess-filename
+ERROR(FileException): http://money.finance.sina.com.cn/mac/view/vMacExcle.php?cate=nation&event=11&from=0&num=9999999&condition=: noaccess-filename

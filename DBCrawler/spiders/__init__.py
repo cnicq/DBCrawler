@@ -1,1 +1,2 @@
-# Place here all your scrapy spiders
+#!/usr/bin/python
+#-*-coding:utf-8-*-

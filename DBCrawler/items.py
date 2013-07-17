@@ -13,3 +13,7 @@ class IndicatorItem(Item):
 class WorldBankIndicatorItem(IndicatorItem):
 	xls_url = Field()
 	code = Field()
+
+class SinaItem(IndicatorItem):
+	cate = Field()
+	event = Field()

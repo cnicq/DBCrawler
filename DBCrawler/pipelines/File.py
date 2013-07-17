@@ -113,7 +113,7 @@ class FilePipeline(MediaPipeline):
     """
         download file pipeline.
     """
-    
+    FILE_STORE_KEY = 'FILE_STORE_SINA'
     MEDIA_NAME = 'file'
     EXPIRES = 90
     ATTACHMENT_FILENAME_UTF8_DOMAIN = []
@@ -135,7 +135,7 @@ class FilePipeline(MediaPipeline):
         cls.EXPIRES = settings.getint('FILE_EXPIRES', 90)
         cls.ATTACHMENT_FILENAME_UTF8_DOMAIN = settings.get('ATTACHMENT_FILENAME_UTF8_DOMAIN',[])
         cls.FILE_EXTENTION = settings.get('FILE_EXTENTION',[])
-        store_uri = settings['FILE_STORE']
+        store_uri = settings[cls.FILE_STORE_KEY]
         return cls(store_uri)
 
     def _get_store(self, uri):
@@ -288,7 +288,3 @@ class FilePipeline(MediaPipeline):
         return filename
 
     	print info;
-
-    def get_media_requests(self, item, info):
-        if len(item['xls_url']) > 0:
-            yield Request(item['xls_url'][0]);

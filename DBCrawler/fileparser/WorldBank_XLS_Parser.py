@@ -4,10 +4,10 @@ import sys
 import os.path
 import pymongo
 import logging
-from DBCrawler.datatypes.DataTypes import IndicatorType
-from DBCrawler.datatypes.DataTypes import MetaData
+from DBCrawler.datatypes.Types import IndicatorType,MetaData,Target
 
 def WorldBank_XLS_Parser():
+	return
 	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\files'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.xls':
