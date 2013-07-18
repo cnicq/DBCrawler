@@ -52,13 +52,43 @@ def Sina_CSV_Parser():
 				first4lines = {}
 				IndicatorTypeCode = ""
 				n = 0
+				IsArea = False
+				subTypeIndex = 2
+
+				# 1.record first four line for use
 				for line in csvlines:
 					if n < 4:
 						first4lines[n] = line;
 					else:
 						break;
 					n += 1
+
+				# 2.if second col of third row can not canvert to float, ot check if it's area
+				try:
+					fValue = float(first4lines[2][1])
+				exception:
+					if u'地区' in first4lines[2][1].replace(' ','').decode('gbk'):
+						IsArea = True
+
+				# 3.iterator the rows, if first col of four line is empty, jump to next row
+				n = 0
+				for line in csvlines:
+					if n == 3 and line[0] == "":
+						subTypeIndex = 3
+					elif n >= 3:
+						for str in line:
+
+
+					n += 1
+
+				# 4.if col value is empty, jump to next col
+				# 5.if col is float value, check to add indicator type and sub type and metadata to mongodb.
+				
 				IndicatorTypeCode = IndicatorType_Parser(first4lines[0]);
+				try:
+					fValue = float(strValue)
+				exception:
+					fvalue = 0.0
 				if u'地区' in first4lines[2][0].replace(' ','').decode('gbk'):
 					del first4lines[2][0]
 					del first4lines[2][1]
