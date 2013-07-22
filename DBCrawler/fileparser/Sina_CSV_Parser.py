@@ -42,6 +42,13 @@ def Area_Parser(csvlines):
 			data.AreaSC3 = Area_Add(str[1])
 			if not isdigit(data[1]):
 				print ""
+def Line_Parser(index, line, IsArea):
+	if line[0] == "":
+		return
+	if 
+	try:
+		fValue = float(line)
+	exception:
 
 def Sina_CSV_Parser():
 	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
@@ -49,41 +56,32 @@ def Sina_CSV_Parser():
 			if os.path.splitext(filename)[1] == '.csv':
 				filepath = os.path.join(dirpath, filename)
 				csvlines = csv.reader(open(filepath, 'r'))
-				first4lines = {}
+				lines = {}
 				IndicatorTypeCode = ""
 				n = 0
 				IsArea = False
-				subTypeIndex = 2
-
-				# 1.record first four line for use
+				HasSubType = False
+				# 1.record lines and infos
 				for line in csvlines:
-					if n < 4:
-						first4lines[n] = line;
-					else:
-						break;
+					lines[n] = line;
 					n += 1
 
 				# 2.if second col of third row can not canvert to float, ot check if it's area
-				try:
-					fValue = float(first4lines[2][1])
-				exception:
-					if u'地区' in first4lines[2][1].replace(' ','').decode('gbk'):
-						IsArea = True
+				if u'地区' in lines[2][1].replace(' ','').decode('gbk'):
+					IsArea = True
+				if lines[3][0] == '' and lines[3][1] != "":
+					HasSubType = True
+					
+				# 3.iterator the rows	
+				for i in range(starIndex, len(lines)):
+					if lines[i][0] == "":
+						continue;
 
-				# 3.iterator the rows, if first col of four line is empty, jump to next row
-				n = 0
-				for line in csvlines:
-					if n == 3 and line[0] == "":
-						subTypeIndex = 3
-					elif n >= 3:
-						for str in line:
-
-
-					n += 1
+				# if u'同比' u'环比', continue
 
 				# 4.if col value is empty, jump to next col
 				# 5.if col is float value, check to add indicator type and sub type and metadata to mongodb.
-				
+'''			
 				IndicatorTypeCode = IndicatorType_Parser(first4lines[0]);
 				try:
 					fValue = float(strValue)
@@ -101,7 +99,7 @@ def Sina_CSV_Parser():
 				
 				for line in csvlines:
 					n += 1
-'''
+
 				IndicatorType_Parser(csvlines[0])
 
 				if csvlines[2].split(',')[1] == 'Area' or csvlines[3].split(',')[1] == 'Area':
