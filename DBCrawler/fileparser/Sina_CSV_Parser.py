@@ -61,6 +61,7 @@ def Sina_CSV_Parser():
 				n = 0
 				IsArea = False
 				HasSubType = False
+				
 				# 1.record lines and infos
 				for line in csvlines:
 					lines[n] = line;
