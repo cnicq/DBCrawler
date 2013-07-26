@@ -5,6 +5,7 @@ import sys
 import os.path
 import pymongo
 import logging
+import time
 #from DBCrawler.datatypes.DBTypes import IndicatorData, MetaData, TargetData, AreaData
 #from DBCrawler.datatypes.Types import IndicatorType,MetaData,Target
 
@@ -14,6 +15,13 @@ class IndicatorData:
 	SrcTarget = ""
 	Note = ""
 	OutURL = ""
+
+	def __init__(self):
+		self.Keywords = []
+		self.NameLoc = {}
+		self.SrcTarget = ""
+		self.Note = ""
+		self.OutURL = ""
 
 	def ToMap(self):
 		DataMap = {}
@@ -37,18 +45,25 @@ class MetaData:
 	Period = ""
 	Datas = []
 
-	def ToMap():
+	def __init__(self):
+		self.AreaID = ""
+		self.Target1ID = ""
+		self.Target2ID = ""
+		self.Period = ""
+		self.Datas = []
+
+	def ToMap(self):
 		DataMap = {}
-		if AreaID != '':
-			DataMap['AreaID'] = AreaID;
-		if Target1ID != '':
-			DataMap['Target1ID'] = Target1ID;
-		if Target2ID != '':
-			DataMap['Target2ID'] = Target2ID;
-		if Period != '':
-			DataMap['Period'] = Period;
-		if len(Datas) > 0:
-			DataMap['Datas'] = Datas;
+		if self.AreaID != None:
+			DataMap['AreaID'] = self.AreaID;
+		if self.Target1ID != None:
+			DataMap['Target1ID'] = self.Target1ID;
+		if self.Target2ID != None:
+			DataMap['Target2ID'] = self.Target2ID;
+		if self.Period != '':
+			DataMap['Period'] = self.Period;
+		if len(self.Datas) > 0:
+			DataMap['Datas'] = self.Datas;
 
 		return DataMap
 
@@ -63,6 +78,16 @@ class AreaData:
 	MapName = ""
 	MapPos = ""
 
+	def __init__(self):
+		self.NameLoc = {}
+		self.SC2 = ""
+		self.SC3 = ""
+		self.NC = ""
+		self.NameFull = ""
+		self.AreaType = ""
+		self.BelongAreaID = ""
+		self.MapName = ""
+		self.MapPos = ""
 	def ToMap(self):
 		DataMap = {}
 		if len(self.NameLoc) > 0:
@@ -77,8 +102,8 @@ class AreaData:
 			DataMap['NameFull'] = self.NameFull;
 		if self.AreaType != '':
 			DataMap['AreaType'] = self.AreaType;
-		if self.BelongArea != '':
-			DataMap['BelongArea'] = self.BelongArea;
+		if self.BelongAreaID != '':
+			DataMap['BelongArea'] = self.BelongAreaID;
 		if self.MapName != '':
 			DataMap['MapName'] = self.MapName;
 		if self.MapPos != '':
@@ -91,25 +116,31 @@ class TargetData:
 	NameLoc = {}
 	Type = ""
 	Note = ""
-	URLs = "[]"
+	URLs = []
 
-	def ToMap():
+	def __init__(self):
+		self.NameLoc = {}
+		self.Type = ""
+		self.Note = ""
+		self.URLs = []
+
+	def ToMap(self):
 		DataMap = {}
-		if URLs != '':
-			DataMap['URLs'] = URLs;
-		if len(NameLoc) > 0:
-			DataMap['NameLoc'] = NameLoc;
-		if MapPos != '':
-			DataMap['Type'] = Type;
-		if Note != '':
-			DataMap['Note'] = Note;
+		if len(self.URLs) != '':
+			DataMap['URLs'] = self.URLs;
+		if len(self.NameLoc) > 0:
+			DataMap['NameLoc'] = self.NameLoc;
+		if self.Type != '':
+			DataMap['Type'] = self.Type;
+		if self.Note != '':
+			DataMap['Note'] = self.Note;
 		return DataMap
 
 class CatalogData:
-	NameLoc = []
+	NameLoc = {}
 	ParentName = ""
 
-	def ToMap():
+	def ToMap(self):
 		DataMap = {}
 		DataMap['Name'] = Name;
 		DataMap['NameLoc'] = NameLoc;
@@ -117,14 +148,17 @@ class CatalogData:
 		return DataMap
 
 
-
+insert_counter = 0
 def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, TargetName2, SrcTarget):
-	#dValue = dValue.replace(' ','').encode('utf8')
-	IndicatorName = IndicatorName.replace(' ','').decode('gbk')
-	#AreaName = AreaName.replace(' ','').encode('utf8')
-	#TargetName1 = TargetName1.replace(' ','').encode('utf8')
-	#TargetName2 = TargetName2.replace(' ','').encode('utf8')
-	SrcTarget = SrcTarget.replace(' ','')
+	global insert_counter;
+	insert_counter += 1
+	print insert_counter
+	dValue = dValue.encode('utf8')
+	IndicatorName = IndicatorName.encode('utf8')
+	AreaName = AreaName.encode('utf8')
+	TargetName1 = TargetName1.encode('utf8')
+	TargetName2 = TargetName2.encode('utf8')
+	SrcTarget = SrcTarget.encode('utf8')
 	if dValue == "":
 		print 'Error : The data value is not set.'
 		return
@@ -155,41 +189,41 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 		print 'Error : Insert indicator data to mongodb failed.'
 		return
 
-	return;
 	#check if has area by area name
 	TheAreaData = con.DBStore.AreaData.find_one({"NameLoc":{"Chinese":AreaName}})
 	if TheAreaData is None:
 		TheAreaData = AreaData()
-		TheAreaData.NameLoc = '[Chinese:' + AreaName + ']'
+		TheAreaData.NameLoc['Chinese'] = AreaName
 		con.DBStore.AreaData.insert(TheAreaData.ToMap())
 	TheAreaData = con.DBStore.AreaData.find_one({"NameLoc":{"Chinese":AreaName}})
 	if TheAreaData is None:
 		print 'Error : Insert area data to mongodb failed.'
 		return
 
+	
 	#check if has target1 by target1 name
 	TheTargetData1 = None
 	if TargetName1 != '':
 		TheTargetData1 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName1}})
 		if TheTargetData1 is None:
 			TheTargetData1 = TargetData()
-			TheTargetData1.NameLoc = '[Chinese:' + AreaName + ']'
+			TheTargetData1.NameLoc['Chinese'] = TargetName1
 			TheTargetData1.Type = 'Indicator'
-			con.DBStore.AreaData.insert(TheTargetData1.ToMap())
+			con.DBStore.TargetData.insert(TheTargetData1.ToMap())
 		TheTargetData1 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName1}})
 		if TheTargetData1 is None:
 			print 'Error : Insert target data to mongodb failed.'
 			return
-
+	
 	#check if has target2 by target2 name
 	TheTargetData2 = None
 	if TargetName2 != '':
 		TheTargetData2 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName2}})
 		if TheTargetData2 is None:
 			TheTargetData2 = TargetData()
-			TheTargetData2.NameLoc = '[Chinese:' + AreaName + ']'
+			TheTargetData2.NameLoc['Chinese'] = TargetName1
 			TheTargetData2.Type = 'Indicator'
-			con.DBStore.AreaData.insert(TheTargetData2.ToMap())
+			con.DBStore.TargetData.insert(TheTargetData2.ToMap())
 		TheTargetData2 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName2}})
 		if TheTargetData2 is None:
 			print 'Error : Insert target data to mongodb failed.'
@@ -203,38 +237,48 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 	elif dValues == 2:
 		Period = 'month'
 	elif dValues == 3:
-		period = 'day'
+		Period = 'day'
 	else:
 		print 'Error : The period data has error.'
 		return
+	
+	
+	MetaDataCollectionName = 'MetaData_' + str(TheIndicatorData['_id']);
 
-	MetaDataCollectionName = 'MetaData_' + TheIndicatorData._id;
-	TheMetaData = con.DBStore.MetaDataCollectionName.find_one(
-		{"AreaID":TheAreaData._id},
-		{"Target1ID":TheTargetData1._id},
-		{"Target2ID":TheTargetData2._id},
-		{"Period":period},
-		{"Datas":{"Date":dValue}})
+	condistions = {}
+	condistions['Period'] = Period
+	condistions['Datas'] = {"Date":dValue}
+	if TheAreaData != None:
+		condistions['AreaID'] = TheAreaData['_id']
+	if TheTargetData1 != None:
+		condistions['Target1ID'] = TheTargetData1['_id']
+	if TheTargetData2 != None:
+		condistions['Target2ID'] = TheTargetData2['_id']
+
+	TheMetaData = con.DBStore[MetaDataCollectionName].find_one(condistions)
+
+	strTime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
 	if TheMetaData is None:
 		TheMetaData = MetaData()
-		TheMetaData.AreaID = TheAreaData._id;
+		if TheAreaData != None:
+			TheMetaData.AreaID = TheAreaData['_id'];
 		if TheTargetData1 != None:
-			TheMetaData.Target1ID = TheTargetData1._id;
+			TheMetaData.Target1ID = TheTargetData1['_id'];
 		if TheTargetData2 != None:
-			TheMetaData.Target2ID = TheTargetData2._id;
-		TheMetaData.Period = period
-		TheMetaData.Datas = []
-		TheMetaData.Datas[0] = {"Datas":{"Date":dValue,"Value":fValue,"UpdateDate":strftime()}}
+			TheMetaData.Target2ID = TheTargetData2['_id'];
+		TheMetaData.Period = Period
+		TheMetaData.Datas.append({"Date":dValue,"Value":fValue,"UpdateDate":strTime})
 		# insert new
-		con.DBStore.MetaDataCollectionName.insert(TheMetaData)
+		con.DBStore[MetaDataCollectionName].insert(TheMetaData.ToMap())
 	else:
 		#update
-		con.DBStore.MetaDataCollectionName.update({"_id":TheMetaData._id}, 
-			{'$push':{"Datas":{"Date":dValue,"Value":fValue,"UpdateDate":strftime()}}})
+		con.DBStore[MetaDataCollectionName].update({"_id":TheMetaData['_id']}, 
+			{'$push':{"Datas":{"Date":dValue,"Value":fValue,"UpdateDate":strTime}}})
 
 	
 def Sina_CSV_Parser():
-	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
+	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
+	for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\sina'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.csv':
 				filepath = os.path.join(dirpath, filename)
@@ -246,16 +290,19 @@ def Sina_CSV_Parser():
 				HasSubType = False
 				StarIndex = 3
 				HasRowTarget = False
-				MainIndicatorName = ""
-				SubIndicatorName = ""
+				MainIndicatorName = u''
+				SubIndicatorName = u''
 
 				# 1.record lines and infos
 				for line in csvlines:
 					lines[n] = line;
 					n += 1
+				for i in range(0, len(lines)):
+					for j in range(0, len(lines[i])):
+						lines[i][j] = unicode(lines[i][j].replace(' ',''),('gbk'))
 
 				# 2.if second col of third row can not canvert to float, ot check if it's area
-				if u'地区' in lines[2][1].replace(' ','').decode('gbk'):
+				if u'地区' in lines[2][1]:
 					HasArea = True
 				if lines[3][0] == '':
 					HasSubType = True
@@ -265,20 +312,20 @@ def Sina_CSV_Parser():
 				MainIndicatorName = lines[0][0].split('_')[2]
 
 				for i in range(StarIndex, len(lines)):
-					TargetName1 = ""
-					TargetName2 = ""
+					TargetName1 = u''
+					TargetName2 = u''
 					AreaName = u'中国'
 					fValue = 0
 					HasRowTarget = False
-					print lines[i]
+					#print lines[i]
 					for j in range(0, len(lines[i])):
 						if j == 0:
 							continue;
 						if j == 1 and HasArea == True:
-							AreaName = lines[i][1]
-							if AreaName == u'全国' or AreaName == u'合计':
+							AreaName = lines[i][j]
+							if AreaName == u'':
 								AreaName = u'中国'
-							if AreaName == '':
+							elif AreaName == u'全国' or AreaName == u'合计':
 								AreaName = u'中国'
 							continue;
 						if j == 1 and HasArea == False:
@@ -300,8 +347,9 @@ def Sina_CSV_Parser():
 						else:
 							TargetName1 = lines[StarIndex-1][j]
 						IndicatorName = MainIndicatorName
-						if SubIndicatorName != '':
-							IndicatorName = MainIndicatorName + '(' + SubIndicatorName + ')'
+						if SubIndicatorName != u'':
+							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
+						
 						Add_MetaData(i,j,lines[i][0], fValue, IndicatorName, AreaName, TargetName1, TargetName2, u'新浪数据')
 
 logger = logging.getLogger() 
