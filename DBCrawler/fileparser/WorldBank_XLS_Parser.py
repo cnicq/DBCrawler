@@ -26,7 +26,7 @@ def WorldBank_XLS_Parser():
 					Indicator.CatalogName = ""
 					Indicator.Code = sheet2.row_values(1)[0]
 					Indicator.Unit = ""
-					Indicator.Period = "Year"
+					Indicator.Period = "year"
 					Indicator.OwnerOrg = sheet2.row_values(1)[3]
 					Indicator.Note = sheet2.row_values(1)[2]
 					

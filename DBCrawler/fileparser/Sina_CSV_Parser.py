@@ -12,14 +12,14 @@ import time
 class IndicatorData:
 	Keywords = []
 	NameLoc = {}
-	SrcTarget = ""
+	SrcTargetID = None
 	Note = ""
 	OutURL = ""
 
 	def __init__(self):
 		self.Keywords = []
 		self.NameLoc = {}
-		self.SrcTarget = ""
+		self.SrcTargetID = None
 		self.Note = ""
 		self.OutURL = ""
 
@@ -29,8 +29,8 @@ class IndicatorData:
 			DataMap['NameLoc'] = self.NameLoc;
 		if len(self.Keywords) > 0:
 			DataMap['Keywords'] = self.Keywords;
-		if self.SrcTarget != '':
-			DataMap['SrcTarget'] = self.SrcTarget;
+		if self.SrcTargetID != None:
+			DataMap['SrcTargetID'] = self.SrcTargetID;
 		if self.Note != '':
 			DataMap['Note'] = self.Note;
 		if self.OutURL != '':
@@ -40,15 +40,15 @@ class IndicatorData:
 
 class MetaData:
 	AreaID = ""
-	Target1ID = ""
-	Target2ID = ""
+	Target1ID = None
+	Target2ID = None
 	Period = ""
 	Datas = []
 
 	def __init__(self):
 		self.AreaID = ""
-		self.Target1ID = ""
-		self.Target2ID = ""
+		self.Target1ID = None
+		self.Target2ID = None
 		self.Period = ""
 		self.Datas = []
 
@@ -126,7 +126,7 @@ class TargetData:
 
 	def ToMap(self):
 		DataMap = {}
-		if len(self.URLs) != '':
+		if len(self.URLs) > 0:
 			DataMap['URLs'] = self.URLs;
 		if len(self.NameLoc) > 0:
 			DataMap['NameLoc'] = self.NameLoc;
@@ -182,7 +182,7 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 	if TheIndicatorData is None:
 		TheIndicatorData = IndicatorData()
 		TheIndicatorData.NameLoc['Chinese'] = IndicatorName
-		TheIndicatorData.SrcTarget = SrcTarget
+		TheIndicatorData.SrcTargetID = TheSrcData['_id']
 		con.DBStore.IndicatorData.insert(TheIndicatorData.ToMap())
 	TheIndicatorData = con.DBStore.IndicatorData.find_one({"NameLoc":{"Chinese":IndicatorName}})
 	if TheIndicatorData is None:
@@ -247,7 +247,6 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 
 	condistions = {}
 	condistions['Period'] = Period
-	condistions['Datas'] = {"Date":dValue}
 	if TheAreaData != None:
 		condistions['AreaID'] = TheAreaData['_id']
 	if TheTargetData1 != None:
@@ -255,8 +254,8 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 	if TheTargetData2 != None:
 		condistions['Target2ID'] = TheTargetData2['_id']
 
-	TheMetaData = con.DBStore[MetaDataCollectionName].find_one(condistions)
 
+	TheMetaData = con.DBStore[MetaDataCollectionName].find_one(condistions)
 	strTime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
 	if TheMetaData is None:
 		TheMetaData = MetaData()
@@ -277,8 +276,9 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 
 	
 def Sina_CSV_Parser():
-	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
-	for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\sina'):
+	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
+	#for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\sina'):
+	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\error'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.csv':
 				filepath = os.path.join(dirpath, filename)
@@ -292,7 +292,7 @@ def Sina_CSV_Parser():
 				HasRowTarget = False
 				MainIndicatorName = u''
 				SubIndicatorName = u''
-
+				print filename
 				# 1.record lines and infos
 				for line in csvlines:
 					lines[n] = line;
@@ -307,7 +307,6 @@ def Sina_CSV_Parser():
 				if lines[3][0] == '':
 					HasSubType = True
 					StarIndex = 4
-				print filename
 				# 3.iterator the rows	
 				MainIndicatorName = lines[0][0].split('_')[2]
 
@@ -317,7 +316,6 @@ def Sina_CSV_Parser():
 					AreaName = u'中国'
 					fValue = 0
 					HasRowTarget = False
-					#print lines[i]
 					for j in range(0, len(lines[i])):
 						if j == 0:
 							continue;
@@ -350,7 +348,7 @@ def Sina_CSV_Parser():
 						if SubIndicatorName != u'':
 							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
 						
-						Add_MetaData(i,j,lines[i][0], fValue, IndicatorName, AreaName, TargetName1, TargetName2, u'新浪数据')
+						#Add_MetaData(i,j,lines[i][0], fValue, IndicatorName, AreaName, TargetName1, TargetName2, u'新浪数据')
 
 logger = logging.getLogger() 
 file = logging.FileHandler("Sina_XLS_Parser.log")
