@@ -276,8 +276,8 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 
 	
 def Sina_CSV_Parser():
-	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
-	#for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\sina'):
+	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
+	for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\sina'):
 	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\error'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.csv':
@@ -348,7 +348,7 @@ def Sina_CSV_Parser():
 						if SubIndicatorName != u'':
 							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
 						
-						#Add_MetaData(i,j,lines[i][0], fValue, IndicatorName, AreaName, TargetName1, TargetName2, u'新浪数据')
+						Add_MetaData(i,j,lines[i][0], fValue, IndicatorName, AreaName, TargetName1, TargetName2, u'新浪数据')
 
 logger = logging.getLogger() 
 file = logging.FileHandler("Sina_XLS_Parser.log")
