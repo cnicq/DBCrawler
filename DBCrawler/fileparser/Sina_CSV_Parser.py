@@ -343,7 +343,7 @@ def Sina_CSV_Parser():
 							TargetName2 = lines[StarIndex-1][j]
 							continue;
 						else:
-							TargetName1 = lines[StarIndex-1][j]
+							TargetName2 = lines[StarIndex-1][j]
 						IndicatorName = MainIndicatorName
 						if SubIndicatorName != u'':
 							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
