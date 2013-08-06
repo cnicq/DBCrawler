@@ -343,12 +343,12 @@ def Sina_CSV_Parser():
 							TargetName2 = lines[StarIndex-1][j]
 							continue;
 						else:
-							TargetName1 = lines[StarIndex-1][j]
+							TargetName2 = lines[StarIndex-1][j]
 						IndicatorName = MainIndicatorName
 						if SubIndicatorName != u'':
 							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
 						
-						#Add_MetaData(i,j,lines[i][0], fValue, IndicatorName, AreaName, TargetName1, TargetName2, u'新浪数据')
+						Add_MetaData(i,j,lines[i][0], fValue, IndicatorName, AreaName, TargetName1, TargetName2, u'新浪数据')
 
 logger = logging.getLogger() 
 file = logging.FileHandler("Sina_XLS_Parser.log")
