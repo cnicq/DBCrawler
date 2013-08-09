@@ -221,7 +221,7 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 		TheTargetData2 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName2}})
 		if TheTargetData2 is None:
 			TheTargetData2 = TargetData()
-			TheTargetData2.NameLoc['Chinese'] = TargetName1
+			TheTargetData2.NameLoc['Chinese'] = TargetName2
 			TheTargetData2.Type = 'Indicator'
 			con.DBStore.TargetData.insert(TheTargetData2.ToMap())
 		TheTargetData2 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName2}})
@@ -347,7 +347,6 @@ def Sina_CSV_Parser():
 						IndicatorName = MainIndicatorName
 						if SubIndicatorName != u'':
 							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
-						
 						Add_MetaData(i,j,lines[i][0], fValue, IndicatorName, AreaName, TargetName1, TargetName2, u'新浪数据')
 
 logger = logging.getLogger() 
