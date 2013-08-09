@@ -230,7 +230,9 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 			return
 
 	# set period type by date format
+	dValue = dValue.replace('/', '.');
 	dValues = len(dValue.split('.'))
+
 	Period = 'year'
 	if dValues == 1:
 		Period = 'year'
@@ -254,9 +256,9 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 	if TheTargetData2 != None:
 		condistions['Target2ID'] = TheTargetData2['_id']
 
-
 	TheMetaData = con.DBStore[MetaDataCollectionName].find_one(condistions)
 	strTime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+
 	if TheMetaData is None:
 		TheMetaData = MetaData()
 		if TheAreaData != None:
@@ -266,19 +268,23 @@ def Add_MetaData(i, j, dValue, fValue, IndicatorName, AreaName, TargetName1, Tar
 		if TheTargetData2 != None:
 			TheMetaData.Target2ID = TheTargetData2['_id'];
 		TheMetaData.Period = Period
-		TheMetaData.Datas.append({"Date":dValue,"Value":fValue,"UpdateDate":strTime})
 		# insert new
+		TheMetaData.Datas.append({"Date":dValue,"Value":fValue,"UpdateDate":strTime})
 		con.DBStore[MetaDataCollectionName].insert(TheMetaData.ToMap())
 	else:
 		#update
+		# If the specific data has value, update it, else insert a new one
+		con.DBStore[MetaDataCollectionName].update({"_id":TheMetaData['_id'] }, 
+			{'$pull':{"Datas":{"Date":dValue}}})
+
 		con.DBStore[MetaDataCollectionName].update({"_id":TheMetaData['_id']}, 
 			{'$push':{"Datas":{"Date":dValue,"Value":fValue,"UpdateDate":strTime}}})
 
 	
 def Sina_CSV_Parser():
 	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
-	for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\sina'):
-	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\error'):
+	#for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\sina'):
+	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\error'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.csv':
 				filepath = os.path.join(dirpath, filename)
@@ -311,10 +317,12 @@ def Sina_CSV_Parser():
 				MainIndicatorName = lines[0][0].split('_')[2]
 
 				for i in range(StarIndex, len(lines)):
+
 					TargetName1 = u''
 					TargetName2 = u''
 					AreaName = u'中国'
 					fValue = 0
+
 					HasRowTarget = False
 					for j in range(0, len(lines[i])):
 						if j == 0:
@@ -335,15 +343,16 @@ def Sina_CSV_Parser():
 						strValue = lines[i][j].replace(' ','')
 						if strValue == '':
 							continue;
+
 						fValue = float(strValue)
 						if HasSubType == True and lines[StarIndex-2][j] != "":
 							SubIndicatorName = lines[StarIndex-2][j]
 						if HasRowTarget == True:
 							TargetName1 = lines[i][1]
 							TargetName2 = lines[StarIndex-1][j]
-							continue;
 						else:
 							TargetName2 = lines[StarIndex-1][j]
+
 						IndicatorName = MainIndicatorName
 						if SubIndicatorName != u'':
 							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
