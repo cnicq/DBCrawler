@@ -4,11 +4,13 @@ import sys
 import os.path
 import pymongo
 import logging
-from DBCrawler.datatypes.Types import IndicatorType,MetaData,Target
+from Data_Manager import MetaData_Insert
+
+from DBCrawler.datatypes.DBTypes import IndicatorData, MetaData, TargetData, AreaData
 
 def WorldBank_XLS_Parser():
 	return
-	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\files'):
+	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\worldbank'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.xls':
 				filepath = os.path.join(dirpath, filename)
@@ -28,7 +30,7 @@ def WorldBank_XLS_Parser():
 					Indicator.Unit = ""
 					Indicator.Period = "year"
 					Indicator.OwnerOrg = sheet2.row_values(1)[3]
-					Indicator.Note = sheet2.row_values(1)[2]
+					Indicator.NoteLoc['Chinese'] = sheet2.row_values(1)[2]
 					
 					con.DBStore.DataIndicators.insert(Indicator.ToMap());
 					code = Indicator.Code;

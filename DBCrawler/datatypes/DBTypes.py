@@ -3,7 +3,7 @@ class IndicatorData:
 	Keywords = []
 	NameLoc = {}
 	SrcTargetID = None
-	Note = ""
+	NoteLoc = {}
 	OutURL = ""
 	CombinedDataID = None
 
@@ -11,7 +11,7 @@ class IndicatorData:
 		self.Keywords = []
 		self.NameLoc = {}
 		self.SrcTargetID = None
-		self.Note = ""
+		self.NoteLoc = {}
 		self.OutURL = ""
 		self.CombinedDataID = None
 
@@ -23,8 +23,8 @@ class IndicatorData:
 			DataMap['Keywords'] = self.Keywords;
 		if self.SrcTargetID != None:
 			DataMap['SrcTargetID'] = self.SrcTargetID;
-		if self.Note != '':
-			DataMap['Note'] = self.Note;
+		if len(self.NoteLoc) > 0:
+			DataMap['NoteLoc'] = self.NoteLoc;
 		if self.OutURL != '':
 			DataMap['OutURL'] = self.OutURL;
 		if self.CombinedDataID != '':
@@ -69,8 +69,8 @@ class CombinedData:
 	Comments = 0
 	Views = 0
 	Catalogs = []
-	Note = {}
-	LastUpdate = ""
+	NoteLoc = {}
+	UpdateTime = ""
 	CombinedType = 0
 
 
@@ -83,8 +83,8 @@ class CombinedData:
 		self.Comments = 0
 		self.Views = 0
 		self.CombinedType = 0
-		self.Note = ""
-		self.LastUpdate = ""
+		self.NoteLoc = {}
+		self.UpdateTime = ""
 
 	def ToMap(self):
 		DataMap = {}
@@ -100,10 +100,10 @@ class CombinedData:
 		DataMap['Views'] = self.Views;
 		DataMap['CombinedType'] = self.CombinedType;
 
-		if self.Note != '':
-			DataMap['Note'] = self.Note;
-		if self.LastUpdate != '':
-			DataMap['LastUpdate'] = self.LastUpdate;
+		if len(self.NoteLoc) > 0:
+			DataMap['NoteLoc'] = self.NoteLoc;
+		if self.UpdateTime != '':
+			DataMap['UpdateTime'] = self.UpdateTime;
 
 		return DataMap
 
@@ -114,7 +114,7 @@ class AreaData:
 	NC = ""
 	NameFull = ""
 	AreaType = ""
-	BelongAreaID = ""
+	BelongAreaID = None
 	MapName = ""
 	MapPos = ""
 
@@ -125,7 +125,7 @@ class AreaData:
 		self.NC = ""
 		self.NameFull = ""
 		self.AreaType = ""
-		self.BelongAreaID = ""
+		self.BelongAreaID = None
 		self.MapName = ""
 		self.MapPos = ""
 	def ToMap(self):
@@ -142,7 +142,7 @@ class AreaData:
 			DataMap['NameFull'] = self.NameFull;
 		if self.AreaType != '':
 			DataMap['AreaType'] = self.AreaType;
-		if self.BelongAreaID != '':
+		if self.BelongAreaID != None:
 			DataMap['BelongArea'] = self.BelongAreaID;
 		if self.MapName != '':
 			DataMap['MapName'] = self.MapName;
@@ -155,13 +155,13 @@ class AreaData:
 class TargetData:
 	NameLoc = {}
 	Type = ""
-	Note = ""
+	NoteLoc = {}
 	URLs = []
 
 	def __init__(self):
 		self.NameLoc = {}
 		self.Type = ""
-		self.Note = ""
+		self.NoteLoc = {}
 		self.URLs = []
 
 	def ToMap(self):
@@ -172,8 +172,8 @@ class TargetData:
 			DataMap['NameLoc'] = self.NameLoc;
 		if self.Type != '':
 			DataMap['Type'] = self.Type;
-		if self.Note != '':
-			DataMap['Note'] = self.Note;
+		if len(self.NoteLoc) > 0:
+			DataMap['NoteLoc'] = self.NoteLoc;
 		return DataMap
 
 class CatalogData:
