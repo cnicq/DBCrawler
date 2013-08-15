@@ -9,13 +9,9 @@ import time
 from Data_Manager import MetaData_Insert
 from DBCrawler.datatypes.DBTypes import IndicatorData, MetaData, TargetData, AreaData
 
-
-
-
 def Sina_CSV_Parser():
-	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
+	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
 	#for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\sina'):
-	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\error'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.csv':
 				filepath = os.path.join(dirpath, filename)
@@ -87,7 +83,8 @@ def Sina_CSV_Parser():
 						IndicatorName = MainIndicatorName
 						if SubIndicatorName != u'':
 							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
-						MetaData_Insert(lines[i][0], fValue, IndicatorName, AreaName, TargetName1, TargetName2, u'新浪数据', con)
+						MetaData_Insert(con, lines[i][0], fValue, IndicatorName, '',
+						 AreaName, '','province', TargetName1, TargetName2, u'新浪数据', 'company')
 
 logger = logging.getLogger() 
 file = logging.FileHandler("Sina_XLS_Parser.log")

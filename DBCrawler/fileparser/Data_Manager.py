@@ -8,7 +8,7 @@ import logging
 import time
 import pymongo
 
-from DBCrawler.datatypes.DBTypes import IndicatorData, CombinedData,AreaData
+from DBCrawler.datatypes.DBTypes import IndicatorData, CombinedData,AreaData,TargetData, MetaData
 insert_counter = 0
 
 def CombinedData_Creator(IndicatorData, con):
@@ -36,8 +36,15 @@ def IndicatorData_CreateDefaultCombinedData():
 		con.DBStore.IndicatorData.update({"_id":IndicatorData['_id']},{'$set' : {'CombinedDataID':CombinedDataID}})
 		print CombinedDataID;
 
-def AreaData_Insert(ChineseName, EnglishName, SC2, SC3, NumberCode, AreaType, BelongAreaID, MapName, MapPos, con):
-	TheAreaData = con.DBStore.AreaData.find_one({"NameLoc":{"Chinese":ChineseName}})
+def AreaData_Insert(con, ChineseName = '', EnglishName='', AreaType='', SC2='', SC3='',
+					NumberCode='', FullName='', BelongAreaID=None, MapName='', MapPos=''):
+	if ChineseName == '' and EnglishName == '':
+		return
+	TheAreaData = None;
+	if ChineseName != '' :
+		TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.Chinese":ChineseName, "AreaType":AreaType})
+	if EnglishName != '' :
+		TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.English":EnglishName, "AreaType":AreaType})
 	if TheAreaData is None:
 		TheAreaData = AreaData()
 		TheAreaData.NameLoc['Chinese'] = ChineseName
@@ -49,91 +56,86 @@ def AreaData_Insert(ChineseName, EnglishName, SC2, SC3, NumberCode, AreaType, Be
 		TheAreaData.BelongAreaID = BelongAreaID
 		TheAreaData.MapName = MapName
 		TheAreaData.MapPos = MapPos
-		TheAreaData = con.DBStore.AreaData.insert(TheAreaData.ToMap())
+		con.DBStore.AreaData.insert(TheAreaData.ToMap())
+		TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.Chinese":ChineseName, "AreaType":AreaType})
 	return TheAreaData;
 
+def IndicatorData_Insert(IndicatorName, Note, SrcTargetID, con):
+	if IndicatorName == '':
+		return None;
+	TheIndicatorData = con.DBStore.IndicatorData.find_one({"NameLoc.Chinese":IndicatorName})
+	if TheIndicatorData is None:
+		TheIndicatorData = IndicatorData()
+		TheIndicatorData.NameLoc['Chinese'] = IndicatorName
+		TheIndicatorData.NoteLoc['Chinese'] = Note
+		TheIndicatorData.SrcTargetID = SrcTargetID
+		con.DBStore.IndicatorData.insert(TheIndicatorData.ToMap())
+		TheIndicatorData = con.DBStore.IndicatorData.find_one({"NameLoc.Chinese":IndicatorName})
+	else:
+		if Note != "" and "NoteLoc" not in TheIndicatorData:
+			con.DBStore.IndicatorData.update({"_id":TheIndicatorData['_id']},{'$set' : {'NoteLoc.Chinese':Note}})
+			TheIndicatorData = con.DBStore.IndicatorData.find_one({"NameLoc.Chinese":IndicatorName})
 
-def MetaData_Insert(dValue, fValue, IndicatorName, AreaName, TargetName1, TargetName2, SrcTarget, con):
+	return TheIndicatorData
+
+def TargetData_Insert(TargetName, Type, con):
+	if TargetName == '':
+		return None;
+	TheTargetData = con.DBStore.TargetData.find_one({"NameLoc.Chinese":TargetName, "Type":Type})
+	if TheTargetData is None:
+		TheTargetData = TargetData()
+		TheTargetData.NameLoc['Chinese'] = TargetName
+		TheTargetData.Type = Type
+		con.DBStore.TargetData.insert(TheTargetData.ToMap())
+		TheTargetData = con.DBStore.TargetData.find_one({"NameLoc.Chinese":TargetName})
+	return TheTargetData
+
+def MetaData_Insert(con, dValue, fValue, IndicatorName, IndicatorNote, AreaChineseName, AreaEnglishName, AreaType,
+	TargetName1, TargetName2, SrcTargetName, SrcTargetType):
 	global insert_counter;
 	insert_counter += 1
 	print insert_counter
 	dValue = dValue.encode('utf8')
 	IndicatorName = IndicatorName.encode('utf8')
-	AreaName = AreaName.encode('utf8')
+	AreaChineseName = AreaChineseName.encode('utf8')
 	TargetName1 = TargetName1.encode('utf8')
 	TargetName2 = TargetName2.encode('utf8')
-	SrcTarget = SrcTarget.encode('utf8')
+	SrcTargetName = SrcTargetName.encode('utf8')
 	if dValue == "":
 		print 'Error : The data value is not set.'
 		return
 
-	#check src target
-	TheSrcData = None
-	if SrcTarget != '':
-		TheSrcData = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":SrcTarget}})
-		if TheSrcData is None:
-			TheSrcData = TargetData()
-			TheSrcData.NameLoc['Chinese'] = SrcTarget
-			TheSrcData.Type = 'Company'
-			con.DBStore.TargetData.insert(TheSrcData.ToMap())
-		TheSrcData = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":SrcTarget}})
-		if TheSrcData is None:
-			print 'Error : Insert src target data to mongodb failed.'
-			return
+	#check realease org target
+	TheSrcData = TargetData_Insert(SrcTargetName, SrcTargetType, con)
+	if TheSrcData is None:
+		print 'Error : Insert src target data to mongodb failed.'
+		return
 
 	#check if has indicator type by indicator name
-	TheIndicatorData = con.DBStore.IndicatorData.find_one({"NameLoc":{"Chinese":IndicatorName}})
-	if TheIndicatorData is None:
-		TheIndicatorData = IndicatorData()
-		TheIndicatorData.NameLoc['Chinese'] = IndicatorName
-		TheIndicatorData.SrcTargetID = TheSrcData['_id']
-		con.DBStore.IndicatorData.insert(TheIndicatorData.ToMap())
-	TheIndicatorData = con.DBStore.IndicatorData.find_one({"NameLoc":{"Chinese":IndicatorName}})
+	TheIndicatorData = IndicatorData_Insert(IndicatorName, IndicatorNote, SrcTargetName, con)
 	if TheIndicatorData is None:
 		print 'Error : Insert indicator data to mongodb failed.'
 		return
 
-	# add default combined data if needed
+	# add default combined data for indicator data if needed
 	if TheIndicatorData['CombinedDataID'] == None:
 		CombinedDataID = CombinedData_Creator(TheIndicatorData, con);
-		print CombinedDataID;
 		if CombinedDataID != None:
 			con.DBStore.IndicatorData.update({"_id":TheIndicatorData['_id']},{'$set' : {'CombinedDataID':CombinedDataID}})
 
 	#check if has area by area name
-	TheAreaData = AreaData_Insert('', AreaName)
+	TheAreaData = AreaData_Insert(con, AreaChineseName, AreaEnglishName, AreaType)
 	if TheAreaData is None:
 		print 'Error : Insert area data to mongodb failed.'
 		return
 
 	#check if has target1 by target1 name
-	TheTargetData1 = None
-	if TargetName1 != '':
-		TheTargetData1 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName1}})
-		if TheTargetData1 is None:
-			TheTargetData1 = TargetData()
-			TheTargetData1.NameLoc['Chinese'] = TargetName1
-			TheTargetData1.Type = 'Indicator'
-			con.DBStore.TargetData.insert(TheTargetData1.ToMap())
-		TheTargetData1 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName1}})
-		if TheTargetData1 is None:
-			print 'Error : Insert target data to mongodb failed.'
-			return
+	TheTargetData1 = TargetData_Insert(TargetName1, 'indicator', con)
 	
 	#check if has target2 by target2 name
-	TheTargetData2 = None
-	if TargetName2 != '':
-		TheTargetData2 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName2}})
-		if TheTargetData2 is None:
-			TheTargetData2 = TargetData()
-			TheTargetData2.NameLoc['Chinese'] = TargetName2
-			TheTargetData2.Type = 'Indicator'
-			con.DBStore.TargetData.insert(TheTargetData2.ToMap())
-		TheTargetData2 = con.DBStore.TargetData.find_one({"NameLoc":{"Chinese":TargetName2}})
-		if TheTargetData2 is None:
-			print 'Error : Insert target data to mongodb failed.'
-			return
+	TheTargetData2 = TargetData_Insert(TargetName2, 'indicator', con)
 
+	# add meta data
 	# set period type by date format
 	dValue = dValue.replace('/', '.');
 	dValue = dValue.replace('-', '.');

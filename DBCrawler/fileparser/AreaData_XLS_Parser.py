@@ -14,8 +14,8 @@ def AreaData_XLS_Parser():
 
 	#check the data indicator
 	for i in range(1, sheet1.nrows):
-		id = AreaData_Insert(sheet1.row_values(i)[0], sheet1.row_values(i)[1], sheet1.row_values(i)[2], sheet1.row_values(i)[3], sheet1.row_values(i)[4], 
-			sheet1.row_values(i)[5], sheet1.row_values(i)[6], sheet1.row_values(i)[7], sheet1.row_values(i)[8], con);
+		id = AreaData_Insert(con, sheet1.row_values(i)[0], sheet1.row_values(i)[1], sheet1.row_values(i)[6], sheet1.row_values(i)[2], sheet1.row_values(i)[3], sheet1.row_values(i)[4], 
+			sheet1.row_values(i)[5],  sheet1.row_values(i)[7], sheet1.row_values(i)[8], sheet1.row_values(i)[9]);
 		print id;
 
 logger = logging.getLogger() 
