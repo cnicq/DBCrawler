@@ -8,7 +8,7 @@ import logging
 import time
 import pymongo
 
-from DBCrawler.datatypes.DBTypes import IndicatorData, CombinedData,AreaData,TargetData, MetaData
+from DBCrawler.datatypes.DBTypes import IndicatorData, CombinedData,AreaData,TargetData, MetaData,CatalogData
 insert_counter = 0
 
 def CombinedData_Creator(IndicatorData, con):
@@ -35,6 +35,19 @@ def IndicatorData_CreateDefaultCombinedData():
 			continue;
 		con.DBStore.IndicatorData.update({"_id":IndicatorData['_id']},{'$set' : {'CombinedDataID':CombinedDataID}})
 		print CombinedDataID;
+
+def CatalogData_Insert(con, Name, ChineseName, ParentName):
+	if Name == '':
+		return;
+	TheCatalogData = con.DBStore.CatalogData.find_one({"NameLoc.Chinese":ChineseName, "Name":Name})
+	if TheCatalogData == None:
+		TheCatalogData = CatalogData()
+		TheCatalogData.NameLoc['Chinese'] = ChineseName
+		TheCatalogData.Name = Name
+		TheCatalogData.ParentName = ParentName
+		con.DBStore.CatalogData.insert(TheCatalogData.ToMap())
+		TheCatalogData = con.DBStore.CatalogData.find_one({"NameLoc.Chinese":ChineseName, "Name":Name})
+	return TheCatalogData;
 
 def AreaData_Insert(con, ChineseName = '', EnglishName='', AreaType='', SC2='', SC3='',
 					NumberCode='', FullName='', BelongAreaID=None, MapName='', MapPos=''):
@@ -192,6 +205,7 @@ def MetaData_Insert(con, dValue, fValue, IndicatorName, IndicatorNote, AreaChine
 def Manager_Cmd():
 	print "Manager Command List : "
 	print "1. Create default combined data for all indicator data"
+	print "2. Load catalog data form excel : catalog.xls"
 	index = int(raw_input("please input:"))
 	if (index == 1):
 		IndicatorData_CreateDefaultCombinedData();

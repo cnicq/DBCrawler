@@ -177,12 +177,21 @@ class TargetData:
 		return DataMap
 
 class CatalogData:
+	Name = ""
 	NameLoc = {}
 	ParentName = ""
 
+	def __init__(self):
+		self.Name = ""
+		self.NoteLoc = {}
+		self.ParentName = ""
+
 	def ToMap(self):
 		DataMap = {}
-		DataMap['Name'] = Name;
-		DataMap['NameLoc'] = NameLoc;
-		DataMap['ParentName'] = ParentName;
+		if self.Name != '':
+			DataMap['Name'] = self.Name;
+		if self.ParentName != '':
+			DataMap['ParentName'] = self.ParentName;
+		if len(self.NameLoc) > 0:
+			DataMap['NameLoc'] = self.NameLoc;
 		return DataMap
