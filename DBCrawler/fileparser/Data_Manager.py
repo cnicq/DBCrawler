@@ -49,7 +49,7 @@ def CatalogData_Insert(con, Name, ChineseName, ParentName):
 		TheCatalogData = con.DBStore.CatalogData.find_one({"NameLoc.Chinese":ChineseName, "Name":Name})
 	return TheCatalogData;
 
-def AreaData_Insert(con, ChineseName = '', EnglishName='', AreaType='', SC2='', SC3='',
+def AreaData_Insert(con, ChineseName = '', EnglishName='', AreaType='city', SC2='', SC3='',
 					NumberCode='', FullName='', BelongAreaID=None, MapName='', MapPos=''):
 	if ChineseName == '' and EnglishName == '':
 		return
