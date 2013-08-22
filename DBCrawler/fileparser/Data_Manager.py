@@ -49,7 +49,7 @@ def CatalogData_Insert(con, Name, ChineseName, ParentName):
 		TheCatalogData = con.DBStore.CatalogData.find_one({"NameLoc.Chinese":ChineseName, "Name":Name})
 	return TheCatalogData;
 
-def AreaData_Insert(con, ChineseName = '', EnglishName='', AreaType='', SC2='', SC3='',
+def AreaData_Insert(con, ChineseName = '', EnglishName='', AreaType='city', SC2='', SC3='',
 					NumberCode='', FullName='', BelongAreaID=None, MapName='', MapPos=''):
 	if ChineseName == '' and EnglishName == '':
 		return
@@ -125,7 +125,7 @@ def MetaData_Insert(con, dValue, fValue, IndicatorName, IndicatorNote, AreaChine
 		return
 
 	#check if has indicator type by indicator name
-	TheIndicatorData = IndicatorData_Insert(IndicatorName, IndicatorNote, SrcTargetName, con)
+	TheIndicatorData = IndicatorData_Insert(IndicatorName, IndicatorNote, TheSrcData['_id'], con)
 	if TheIndicatorData is None:
 		print 'Error : Insert indicator data to mongodb failed.'
 		return
