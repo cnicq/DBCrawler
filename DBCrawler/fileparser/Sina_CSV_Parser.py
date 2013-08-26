@@ -6,12 +6,12 @@ import os.path
 import pymongo
 import logging
 import time
-from Data_Manager import MetaData_Insert
-from DBCrawler.datatypes.DBTypes import IndicatorData, MetaData, TargetData, AreaData
+from Data_Manager import MetaData_Insert,TargetData_Insert
+from DBCrawler.datatypes.DBTypes import IndicatorData, MetaData, TargetData, AreaData,TargetData
 
 def Sina_CSV_Parser():
 	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
-	for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\sina'):
+	for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\indicator'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.csv':
 				filepath = os.path.join(dirpath, filename)
@@ -40,9 +40,23 @@ def Sina_CSV_Parser():
 				if lines[3][0] == '':
 					HasSubType = True
 					StarIndex = 4
-				# 3.iterator the rows	
-				MainIndicatorName = lines[0][0].split('_')[2]
 
+				# 3. src target
+				MainIndicatorName = ''
+				IndicatorNote = ''
+				if lines[0][0] != '':
+					MainIndicatorName = lines[0][0].split('_')[2]
+				else:
+					MainIndicatorName = lines[0][1]
+				IndicatorNote = lines[0][2];
+				SrcTargetName = ''
+				if lines[0][3] != '':
+					SrcTargetName = lines[0][3]
+				else:
+					SrcTargetName = u'互联网'
+				TheSrcTargetData = TargetData_Insert(SrcTargetName, 'organization', con);
+
+				# 4.iterator the rows	
 				for i in range(StarIndex, len(lines)):
 
 					TargetName1 = u''
@@ -83,8 +97,9 @@ def Sina_CSV_Parser():
 						IndicatorName = MainIndicatorName
 						if SubIndicatorName != u'':
 							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
-						MetaData_Insert(con, lines[i][0], fValue, IndicatorName, '',
-						 AreaName, '','province', TargetName1, TargetName2, u'新浪数据', 'company')
+						MetaData_Insert(con, lines[i][0], fValue, IndicatorName, IndicatorNote,
+						 	AreaName, '','', TargetName1, TargetName2, 
+						 	TheSrcTargetData['NameLoc']['Chinese'], TheSrcTargetData['Type'])
 
 logger = logging.getLogger() 
 file = logging.FileHandler("Sina_XLS_Parser.log")

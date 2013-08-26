@@ -49,15 +49,21 @@ def CatalogData_Insert(con, Name, ChineseName, ParentName):
 		TheCatalogData = con.DBStore.CatalogData.find_one({"NameLoc.Chinese":ChineseName, "Name":Name})
 	return TheCatalogData;
 
-def AreaData_Insert(con, ChineseName = '', EnglishName='', AreaType='city', SC2='', SC3='',
+def AreaData_Insert(con, ChineseName = '', EnglishName='', AreaType='', SC2='', SC3='',
 					NumberCode='', FullName='', BelongAreaID=None, MapName='', MapPos=''):
 	if ChineseName == '' and EnglishName == '':
 		return
 	TheAreaData = None;
 	if ChineseName != '' :
-		TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.Chinese":ChineseName, "AreaType":AreaType})
+		if AreaType != '':
+			TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.Chinese":ChineseName, "AreaType":AreaType})
+		else:
+			TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.Chinese":ChineseName})
 	if EnglishName != '' :
-		TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.English":EnglishName, "AreaType":AreaType})
+		if AreaType != '':
+			TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.English":EnglishName, "AreaType":AreaType})
+		else :
+			TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.English":EnglishName})
 	if TheAreaData is None:
 		TheAreaData = AreaData()
 		TheAreaData.NameLoc['Chinese'] = ChineseName
