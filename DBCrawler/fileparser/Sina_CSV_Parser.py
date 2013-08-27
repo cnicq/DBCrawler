@@ -11,7 +11,8 @@ from DBCrawler.datatypes.DBTypes import IndicatorData, MetaData, TargetData, Are
 
 def Sina_CSV_Parser():
 	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\sina'):
-	for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\indicator'):
+	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DB\\csvs'):
+	#for dirpath, dirnames, filenames in os.walk('C:\\Git\\DBCrawler\\DBCrawler\\media\\indicator'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.csv':
 				filepath = os.path.join(dirpath, filename)
@@ -32,7 +33,8 @@ def Sina_CSV_Parser():
 					n += 1
 				for i in range(0, len(lines)):
 					for j in range(0, len(lines[i])):
-						lines[i][j] = unicode(lines[i][j].replace(' ',''),('gbk'))
+						#lines[i][j] = unicode(lines[i][j].replace(' ',''),('gbk'))
+						lines[i][j] = unicode(lines[i][j].replace(' ',''),('utf8'))
 
 				# 2.if second col of third row can not canvert to float, ot check if it's area
 				if u'地区' in lines[2][1]:
