@@ -8,7 +8,8 @@ from Data_Manager import MetaData_Insert, IndicatorData_Insert, TargetData_Inser
 from DBCrawler.datatypes.DBTypes import IndicatorData, MetaData, TargetData, AreaData
 
 def WorldBank_XLS_Parser():
-	for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\worldbank'):
+	#for dirpath, dirnames, filenames in os.walk('E:\\Study\\Web\\Root\\DBCrawler\\DBCrawler\\media\\worldbank'):
+	for dirpath, dirnames, filenames in os.walk('c:\\Git\\\DBCrawler\\DBCrawler\\media\\sina'):
 		for filename in filenames:
 			if os.path.splitext(filename)[1] == '.xls':
 				filepath = os.path.join(dirpath, filename)
