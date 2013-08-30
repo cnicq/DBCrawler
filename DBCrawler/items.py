@@ -17,3 +17,7 @@ class WorldBankIndicatorItem(IndicatorItem):
 class SinaItem(IndicatorItem):
 	cate = Field()
 	event = Field()
+
+class HeXunItem(IndicatorItem):
+	id = Field()
+	url = Field()	

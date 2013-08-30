@@ -6,6 +6,7 @@ class IndicatorData:
 	NoteLoc = {}
 	OutURL = ""
 	CombinedDataID = None
+	SrcURL={}
 
 	def __init__(self):
 		self.Keywords = []
@@ -14,6 +15,7 @@ class IndicatorData:
 		self.NoteLoc = {}
 		self.OutURL = ""
 		self.CombinedDataID = None
+		self.SrcURL = {}
 
 	def ToMap(self):
 		DataMap = {}
@@ -29,6 +31,8 @@ class IndicatorData:
 			DataMap['OutURL'] = self.OutURL;
 		if self.CombinedDataID != '':
 			DataMap['CombinedDataID'] = self.CombinedDataID;
+		if len(self.SrcURL) > 0:
+			DataMap['SrcURL'] = self.SrcURL;
 
 		return DataMap
 

@@ -8,7 +8,8 @@ NEWSPIDER_MODULE = 'DBCrawler.spiders'
 DEFAULT_ITEM_CLASS = 'DBCrawler.items.IndicatorItem'
 
 ITEM_PIPELINES = ['DBCrawler.pipelines.WorldBank.WorldBankPipeline',
-'DBCrawler.pipelines.Sina.SinaPipeline']
+'DBCrawler.pipelines.Sina.SinaPipeline',
+'DBCrawler.pipelines.HeXun.HeXunPipeline']
 
 FILE_STORE = os.path.join(PROJECT_DIR,'media/files')
 FILE_STORE_SINA = os.path.join(PROJECT_DIR,'media/sina')
