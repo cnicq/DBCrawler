@@ -29,10 +29,21 @@ class HeXunSpider(BaseSpider):
     def parse_firestpage(self, response):
         Item = HeXunItem()
         hxs = HtmlXPathSelector(response)
-        indicatort_info['total_pages'] = '';
-        indicatort_info['taget1s'] = [];
-        indicatort_info['taget2s'] = [];
-        yield Request(url=urllink, callback=self.parse_nextpage)
+        self.indicatort_info['total_pages'] = '';
+        self.indicatort_info['taget2s'] = [];
+
+        #"Talbe scroll_title, scroll_title1, scroll_list, scroll_list1";
+        #1.check scroll_list1 tr counter
+        rows = hxs.select("//table[@id='scroll_title1']/tr")
+        for row in rows:
+            spans = row.select("//td[contains(@id,'col')]/span/text()");
+            print len(spans);
+            for span in spans:
+                print span.extract();
+        #for id in ids:
+        #    print id;
+        #print len(rows);
+        #yield Request(url=urllink, callback=self.parse_nextpage)
 
     def parse_nextpage(self, response):
         Item = HeXunItem()

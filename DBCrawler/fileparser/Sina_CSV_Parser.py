@@ -98,7 +98,7 @@ def Sina_CSV_Parser():
 
 						IndicatorName = MainIndicatorName
 						if SubIndicatorName != u'':
-							IndicatorName = MainIndicatorName + u'(' + SubIndicatorName + u')'
+							IndicatorName = SubIndicatorName + u'-' + MainIndicatorName
 						MetaData_Insert(con, lines[i][0], fValue, IndicatorName, IndicatorNote,
 						 	AreaName, '','', TargetName1, TargetName2, 
 						 	TheSrcTargetData['NameLoc']['Chinese'], TheSrcTargetData['Type'])
