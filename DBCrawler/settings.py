@@ -13,6 +13,7 @@ ITEM_PIPELINES = ['DBCrawler.pipelines.WorldBank.WorldBankPipeline',
 
 FILE_STORE = os.path.join(PROJECT_DIR,'media/files')
 FILE_STORE_SINA = os.path.join(PROJECT_DIR,'media/sina')
+FILE_STORE_HEXUN = os.path.join(PROJECT_DIR,'media/hexun')
 FILE_EXTENTION = ['.csv','.xml','.xls','.zip']
 ATTACHMENT_FILENAME_UTF8_DOMAIN = []
 FILE_EXPIRES = 30
