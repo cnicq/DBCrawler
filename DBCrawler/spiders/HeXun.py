@@ -8,6 +8,8 @@ import csv
 import json
 import os
 from scrapy.conf import settings
+from collections import OrderedDict
+
 #Two step : 
 #1.Parse cate name and event id from http://mac.hexun.com
 class HeXunSpider(BaseSpider):
@@ -37,9 +39,11 @@ class HeXunSpider(BaseSpider):
     def parse_firestpage(self, response):
         Item = HeXunItem()
         hxs = HtmlXPathSelector(response)
-        
-        if self.indicatort_info.has_key(response.url) == False:
-            return
+        matches = re.search(r'(.*)/(.*).shtml(.*)', response.url);
+        if matches == None:
+            return;
+        key = matches.groups()[1]
+        self.indicatort_info[key]['key'] = matches.groups()[1];
         
         #"Talbe scroll_title, scroll_title1, scroll_list, scroll_list1";
         rows = hxs.select("//table[@id='scroll_title1']/tr")
@@ -99,30 +103,50 @@ class HeXunSpider(BaseSpider):
         
         # add title
         title_list = ['']
-        title_list.append(self.indicatort_info[response.url]['indicator']);
-        title_list.append(self.indicatort_info[response.url]['indicator']);
+        title_list.append(self.indicatort_info[key]['indicator']);
+        title_list.append(self.indicatort_info[key]['indicator']);
         title_list.append('HeXun');
         title_list.append(response.url);
-        writer = csv.writer(file(settings['FILE_STORE_HEXUN'] + '/' + self.indicatort_info[response.url]['indicator'] + '.csv', 'wb'))
+        writer = csv.writer(file(settings['FILE_STORE_HEXUN'] + '/' + self.indicatort_info[key]['indicator'] + '.csv', 'wb'))
         writer.writerow(title_list)
         writer.writerow([])
         title_list = titles[len(titles)-1];
         title_list.insert(0, ('日期').decode('utf-8').encode('GBK'));
         writer.writerow(title_list)
-        urllink = "http://mac.hexun.com/Details/" + self.indicatort_info[response.url]['key'] + ".ashx?pid=1"
+        urllink = "http://mac.hexun.com/Details/" + self.indicatort_info[key]['key'] + ".ashx?pid=1"
         yield Request(url=urllink, callback=self.parse_content)
 
     def parse_content(self, response):
-        str = response.body;
-        str = re.sub(r",FUpdateTime(.*?)\)", r'', str)
-        str = re.sub(r"{\s*(\w)", r'{"\1', str)
-        str = re.sub(r",\s*(\w)", r',"\1', str)
-        str = re.sub(r"(\w):", r'\1":', str)
+        matches = re.search(r'(.*)/(.*).ashx\?pid=(.*)', response.url);
+        print response.url
+        if matches == None:
+            return;
+        key = matches.groups()[1]
+        page = int(matches.groups()[2])
+        str1 = response.body;
+        str1 = re.sub(r",FUpdateTime(.*?)\)", r'', str1)
+        str1 = re.sub(r"{\s*(\w)", r'{"\1', str1)
+        str1 = re.sub(r",\s*(\w)", r',"\1', str1)
+        str1 = re.sub(r"(\w):", r'\1":', str1)
         
-        data = json.loads(str);
-        self.indicatort_info[]
-        #data = json.loads(json.loads(response.body));
-        #print type(data)
+        data = json.loads(str1,object_pairs_hook=OrderedDict)
+
+        self.indicatort_info[key]['pages'] = (data['Pages'])
+        writer = csv.writer(file(settings['FILE_STORE_HEXUN'] + '/' + self.indicatort_info[key]['indicator'] + '.csv', 'a'))
+        for i in range(len(data['List'])):
+            line = []
+            line.append(data['List'][i]['FYear']);
+            for k in data['List'][i]:
+                print type(data['List'][i][k])
+                if type(data['List'][i][k]) == int or type(data['List'][i][k]) == float:
+                    line.append(str(data['List'][i][k]));
+            writer.writerow(line)
+
+        if page < self.indicatort_info[key]['pages'] :
+            urllink = "http://mac.hexun.com/Details/" + self.indicatort_info[key]['key'] + ".ashx?pid=" + str(page+1)
+            print urllink
+            yield Request(url=urllink, callback=self.parse_content)
+
 
     def get_title(self, key):
         for i in range(len(titles)):
