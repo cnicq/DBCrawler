@@ -8,8 +8,8 @@ import logging
 from Data_Manager import CatalogData_Insert
 
 def CatalogData_XLS_Parser():
-	#filename = 'E:\Study\Web\Root\DB\Doc\Area.xlsx'
-	filename = 'c:\git\DB\Doc\Catalog.xlsx'
+	filename = 'E:\Study\Web\Root\DB\Doc\Catalog.xlsx'
+	#filename = 'c:\git\DB\Doc\Catalog.xlsx'
 	xlsfile = xlrd.open_workbook(filename)
 	sheet1 = xlsfile.sheet_by_name("Sheet1")
 
