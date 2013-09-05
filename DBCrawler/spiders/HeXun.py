@@ -19,6 +19,9 @@ class HeXunSpider(BaseSpider):
         "http://mac.hexun.com/",
     ]
     indicatort_info = {}
+    area_list = ['cityname', 'FProvince'];
+    time_list = ['FYear', 'FMonth', 'year', 'FDate', 'FSeason', 'FEndDate'];
+    exp_list = ['FNo', 'cityname', 'FProvince', 'FYear', 'FMonth', 'year', 'FDate', 'FSeason', 'FStartDate', 'FEndDate' ]
 
     def parse(self, response):
         self.totalpage = 0;
@@ -28,13 +31,12 @@ class HeXunSpider(BaseSpider):
         for id in ids:
             id_param = re.match(r'Default.shtml\?id=(.*)', id.select('@href').extract()[0])
             if id_param is not None:
+                #if id_param.group(1).strip() != 'D131W':
+                #    continue;
                 urllink = "http://mac.hexun.com/Details/" + id_param.group(1).strip() + ".shtml?pid=1";
                 self.indicatort_info[id_param.group(1).strip()] = {}
                 self.indicatort_info[id_param.group(1).strip()]['indicator'] = self.get_title(id_param.group(1).strip());
                 yield Request(url=urllink, callback=self.parse_firestpage)
-                i += 1
-                if i == 2:
-                    break;
     
     def parse_firestpage(self, response):
         Item = HeXunItem()
@@ -44,8 +46,14 @@ class HeXunSpider(BaseSpider):
             return;
         key = matches.groups()[1]
         self.indicatort_info[key]['key'] = matches.groups()[1];
+        item_keys = [];
+        matches = re.findall(r'{item.(.*?)}', response.body);
+        if len(matches) == 0:
+            return;
+        self.indicatort_info[key]['item_keys'] = matches;
         
         #"Talbe scroll_title, scroll_title1, scroll_list, scroll_list1";
+        titlerows = len(hxs.select("//table[@id='scroll_title']/tr/td"))
         rows = hxs.select("//table[@id='scroll_title1']/tr")
         ids = rows.select("//table[@id='scroll_title1']/tr/td[contains(@id,'col')]/span/text()")
         ids2 = rows.select("//table[@id='scroll_title1']/tr/td/span/text()")
@@ -111,14 +119,34 @@ class HeXunSpider(BaseSpider):
         writer.writerow(title_list)
         writer.writerow([])
         title_list = titles[len(titles)-1];
-        title_list.insert(0, ('日期').decode('utf-8').encode('GBK'));
+
+        for i in range(len(matches)):
+            breakall = False
+            for j in range(len(self.area_list)):
+                if matches[i] == self.area_list[j]:
+                    title_list.insert(0, ('地区').decode('utf-8').encode('GBK'));
+                    breakall = True
+                    break;
+            if breakall:
+                break;
+
+        for i in range(len(matches)):
+            breakall = False
+            for j in range(len(self.time_list)):
+                if matches[i] == self.time_list[j]:
+                    title_list.insert(0, ('日期').decode('utf-8').encode('GBK'));
+                    break;
+            if breakall:
+                break;
+        
         writer.writerow(title_list)
         urllink = "http://mac.hexun.com/Details/" + self.indicatort_info[key]['key'] + ".ashx?pid=1"
+        print urllink
         yield Request(url=urllink, callback=self.parse_content)
 
     def parse_content(self, response):
         matches = re.search(r'(.*)/(.*).ashx\?pid=(.*)', response.url);
-        print response.url
+        
         if matches == None:
             return;
         key = matches.groups()[1]
@@ -130,21 +158,43 @@ class HeXunSpider(BaseSpider):
         str1 = re.sub(r"(\w):", r'\1":', str1)
         
         data = json.loads(str1,object_pairs_hook=OrderedDict)
-
         self.indicatort_info[key]['pages'] = (data['Pages'])
-        writer = csv.writer(file(settings['FILE_STORE_HEXUN'] + '/' + self.indicatort_info[key]['indicator'] + '.csv', 'a'))
+        writer = csv.writer(file(settings['FILE_STORE_HEXUN'] + '/' + self.indicatort_info[key]['indicator'] + '.csv', 'ab'))
+        
         for i in range(len(data['List'])):
             line = []
-            line.append(data['List'][i]['FYear']);
-            for k in data['List'][i]:
-                print type(data['List'][i][k])
-                if type(data['List'][i][k]) == int or type(data['List'][i][k]) == float:
-                    line.append(str(data['List'][i][k]));
-            writer.writerow(line)
-
+            timestr = ''
+            for j in range(len(self.time_list)):
+                if data['List'][i].has_key(self.time_list[j]):
+                    timestr = str(data['List'][i][self.time_list[j]])
+                    break
+            if timestr == '':
+                print 'Error : unrecognize time keyword';
+                return;
+            if len(timestr) == 6:
+                timestr = timestr[:4] + '.' + timestr[4:]
+            if len(timestr) == 8:
+                timestr = timestr[:4] + '.' + timestr[4:]
+                timestr = timestr[:7] + '.' + timestr[7:]
+            line.append(timestr);
+            for j in range(len(self.area_list)):
+                if data['List'][i].has_key(self.area_list[j]):
+                    line.append(data['List'][i][self.area_list[j]].encode('gbk'));
+            for k in range(len(self.indicatort_info[key]['item_keys'])):
+                bHas = False
+                keyw = self.indicatort_info[key]['item_keys'][k]
+                for j in range(len(self.exp_list)):
+                    if keyw == self.exp_list[j]:
+                        bHas = True
+                        break;
+                if bHas:
+                    continue;
+                if type(data['List'][i][keyw]) == int or type(data['List'][i][keyw]) == float:
+                    line.append(str(data['List'][i][keyw]));
+            if len(line) > 0:
+                writer.writerow(line)
         if page < self.indicatort_info[key]['pages'] :
             urllink = "http://mac.hexun.com/Details/" + self.indicatort_info[key]['key'] + ".ashx?pid=" + str(page+1)
-            print urllink
             yield Request(url=urllink, callback=self.parse_content)
 
 

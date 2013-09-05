@@ -57,17 +57,27 @@ def AreaData_Insert(con, ChineseName = '', EnglishName='', AreaType='', SC2='', 
 	if ChineseName != '' :
 		if AreaType != '':
 			TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.Chinese":ChineseName, "AreaType":AreaType})
+			if TheAreaData == None:
+				TheAreaData = con.DBStore.AreaData.find_one({"NameFull":ChineseName, "AreaType":AreaType})
 		else:
 			TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.Chinese":ChineseName})
+			if TheAreaData == None:
+				TheAreaData = con.DBStore.AreaData.find_one({"NameFull":ChineseName})
 	if EnglishName != '' :
 		if AreaType != '':
 			TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.English":EnglishName, "AreaType":AreaType})
+			if TheAreaData == None:
+				TheAreaData = con.DBStore.AreaData.find_one({"NameFull":EnglishName, "AreaType":AreaType})
 		else :
 			TheAreaData = con.DBStore.AreaData.find_one({"NameLoc.English":EnglishName})
+			if TheAreaData == None:
+				TheAreaData = con.DBStore.AreaData.find_one({"NameFull":EnglishName})
+
 	if TheAreaData is None:
 		TheAreaData = AreaData()
 		TheAreaData.NameLoc['Chinese'] = ChineseName
 		TheAreaData.NameLoc['English'] = EnglishName
+		TheAreaData.NameFull = FullName
 		TheAreaData.SC2 = SC2
 		TheAreaData.SC3 = SC3
 		TheAreaData.NumberCode = NumberCode
@@ -114,6 +124,9 @@ def MetaData_Insert(con, dValue, fValue, IndicatorName, IndicatorNote, AreaChine
 	global insert_counter;
 	insert_counter += 1
 	print insert_counter
+	if fValue == 0:
+		print "Error: value is 0!"
+		return;
 	dValue = dValue.encode('utf8')
 	IndicatorName = IndicatorName.encode('utf8')
 	AreaChineseName = AreaChineseName.encode('utf8')
