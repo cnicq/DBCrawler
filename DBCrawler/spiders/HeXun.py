@@ -24,6 +24,7 @@ class HeXunSpider(BaseSpider):
     exp_list = ['FNo', 'cityname', 'FProvince', 'FYear', 'FMonth', 'year', 'FDate', 'FSeason', 'FStartDate', 'FEndDate' ]
 
     def parse(self, response):
+       
         self.totalpage = 0;
         hxs = HtmlXPathSelector(response)
         ids = hxs.select('//a[contains(@href, "Default.shtml?id=")]');

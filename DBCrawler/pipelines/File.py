@@ -113,7 +113,7 @@ class FilePipeline(MediaPipeline):
     """
         download file pipeline.
     """
-    FILE_STORE_KEY = 'FILE_STORE_SINA'
+    FILE_STORE_KEY = 'FILE_STORE'
     MEDIA_NAME = 'file'
     EXPIRES = 90
     ATTACHMENT_FILENAME_UTF8_DOMAIN = []

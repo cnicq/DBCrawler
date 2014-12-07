@@ -22,5 +22,8 @@ class WorldBankSpider(BaseSpider):
         response_selector = HtmlXPathSelector(response)
         item = WorldBankIndicatorItem()
         item['xls_url'] = response_selector.select('//li[@class="download-xls first"][1]/a/@href').extract()
+        print '--------11111------------'
+        print item['xls_url']
+        print '--------22222------------'
         if item['xls_url']  != "":
             return item
